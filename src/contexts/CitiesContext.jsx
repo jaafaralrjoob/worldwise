@@ -17,6 +17,7 @@ const initialState = {
   currentCity: {},
   error: "",
 };
+
 function reducer(state, action) {
   switch (action.type) {
     case "loading":
@@ -28,22 +29,6 @@ function reducer(state, action) {
     case "city/loaded":
       return { ...state, isLoading: false, currentCity: action.payload };
 
-    case "city/created":
-      return {
-        ...state,
-        isLoading: false,
-        cities: [...state.cities, action.payload],
-        currentCity: action.payload,
-      };
-
-    case "city/deleted":
-      return {
-        ...state,
-        isLoading: false,
-        cities: state.cities.filter((city) => city.id !== action.payload),
-        currentCity: {},
-      };
-
     case "rejected":
       return { ...state, isLoading: false, error: action.payload };
 
@@ -53,20 +38,16 @@ function reducer(state, action) {
 }
 
 function CitiesProvider({ children }) {
-  // const [cities, setCities] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [currentCity, setCurrentcity] = useState({});
-
   const [{ cities, isLoading, currentCity, error }, dispatch] = useReducer(
     reducer,
     initialState
   );
 
-  useEffect(function () {
+  useEffect(() => {
     async function fetchCities() {
       dispatch({ type: "loading" });
       try {
-        const res = await fetch(`${BASE_URL}/cities`);
+        const res = await fetch(BASE_URL);
         const data = await res.json();
         dispatch({ type: "cities/loaded", payload: data });
       } catch {
@@ -86,9 +67,10 @@ function CitiesProvider({ children }) {
       dispatch({ type: "loading" });
 
       try {
-        const res = await fetch(`${BASE_URL}/cities/?id=${id}`);
+        const res = await fetch(BASE_URL);
         const data = await res.json();
-        dispatch({ type: "city/loaded", payload: data[0] });
+        const city = data.find((city) => city.id === Number(id));
+        dispatch({ type: "city/loaded", payload: city });
       } catch {
         dispatch({
           type: "rejected",
@@ -99,6 +81,8 @@ function CitiesProvider({ children }) {
     [currentCity.id]
   );
 
+  // Create and delete functions are commented out because they can't be used with GitHub raw URLs
+  /*
   async function createCity(newCity) {
     dispatch({ type: "loading" });
 
@@ -133,6 +117,7 @@ function CitiesProvider({ children }) {
       });
     }
   }
+  */
 
   return (
     <CitiesContext.Provider
@@ -142,18 +127,20 @@ function CitiesProvider({ children }) {
         currentCity,
         error,
         getCity,
-        createCity,
-        deleteCity,
+        // createCity,
+        // deleteCity,
       }}
     >
       {children}
     </CitiesContext.Provider>
   );
 }
+
 function useCities() {
   const context = useContext(CitiesContext);
   if (context === undefined)
     throw new Error("CitiesContext was used outside the CitiesProvider");
   return context;
 }
+
 export { CitiesProvider, useCities };
