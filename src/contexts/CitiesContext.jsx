@@ -6,7 +6,8 @@ import {
   useReducer,
 } from "react";
 
-const BASE_URL = "https://raw.githubusercontent.com/jaafaralrjoob/worldwise/main/data/cities.json";
+const BASE_URL =
+  "https://raw.githubusercontent.com/jaafaralrjoob/worldwise/main/data/cities.json";
 
 const CitiesContext = createContext();
 
@@ -102,7 +103,7 @@ function CitiesProvider({ children }) {
     dispatch({ type: "loading" });
 
     try {
-      const res = await fetch(`${BASE_URL}/cities/`, {
+      const res = await fetch(`${BASE_URL}`, {
         method: "POST",
         body: JSON.stringify(newCity),
         headers: { "Content-Type": "application/json" },
