@@ -1,0 +1,7 @@
+{
+  "extends": ["react-app"],
+  "no-unused-vars": "warn",
+  "rules": {
+    "react/prop-types": "off"
+  }
+}
