@@ -48,9 +48,11 @@ function CitiesProvider({ children }) {
       dispatch({ type: "loading" });
       try {
         const res = await fetch(BASE_URL);
+        if (!res.ok) throw new Error("Network response was not ok");
         const data = await res.json();
         dispatch({ type: "cities/loaded", payload: data });
-      } catch {
+      } catch (error) {
+        console.error("Error fetching cities:", error);
         dispatch({
           type: "rejected",
           payload: "There was an error loading cities...",
@@ -68,10 +70,12 @@ function CitiesProvider({ children }) {
 
       try {
         const res = await fetch(BASE_URL);
+        if (!res.ok) throw new Error("Network response was not ok");
         const data = await res.json();
         const city = data.find((city) => city.id === Number(id));
         dispatch({ type: "city/loaded", payload: city });
-      } catch {
+      } catch (error) {
+        console.error("Error fetching city:", error);
         dispatch({
           type: "rejected",
           payload: "There was an error loading the city...",
@@ -81,44 +85,6 @@ function CitiesProvider({ children }) {
     [currentCity.id]
   );
 
-  // Create and delete functions are commented out because they can't be used with GitHub raw URLs
-  /*
-  async function createCity(newCity) {
-    dispatch({ type: "loading" });
-
-    try {
-      const res = await fetch(`${BASE_URL}/cities/`, {
-        method: "POST",
-        body: JSON.stringify(newCity),
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await res.json();
-      dispatch({ type: "city/created", payload: data });
-    } catch {
-      dispatch({
-        type: "rejected",
-        payload: "There was an error creating the city...",
-      });
-    }
-  }
-
-  async function deleteCity(id) {
-    dispatch({ type: "loading" });
-
-    try {
-      await fetch(`${BASE_URL}/cities/${id}`, {
-        method: "DELETE",
-      });
-      dispatch({ type: "city/deleted", payload: id });
-    } catch {
-      dispatch({
-        type: "rejected",
-        payload: "There was an error deleting the city...",
-      });
-    }
-  }
-  */
-
   return (
     <CitiesContext.Provider
       value={{
@@ -127,8 +93,6 @@ function CitiesProvider({ children }) {
         currentCity,
         error,
         getCity,
-        // createCity,
-        // deleteCity,
       }}
     >
       {children}
