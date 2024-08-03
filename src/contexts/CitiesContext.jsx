@@ -2,12 +2,10 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useReducer,
+  useEffect,
 } from "react";
-
-const BASE_URL =
-  "https://raw.githubusercontent.com/jaafaralrjoob/worldwise/main/data/cities.json";
+import citiesData from "../../data/cities.json";
 
 const CitiesContext = createContext();
 
@@ -44,22 +42,15 @@ function CitiesProvider({ children }) {
   );
 
   useEffect(() => {
-    async function fetchCities() {
-      dispatch({ type: "loading" });
-      try {
-        const res = await fetch(BASE_URL);
-        if (!res.ok) throw new Error("Network response was not ok");
-        const data = await res.json();
-        dispatch({ type: "cities/loaded", payload: data });
-      } catch (error) {
-        console.error("Error fetching cities:", error);
-        dispatch({
-          type: "rejected",
-          payload: "There was an error loading cities...",
-        });
-      }
+    dispatch({ type: "loading" });
+    try {
+      dispatch({ type: "cities/loaded", payload: citiesData });
+    } catch (error) {
+      dispatch({
+        type: "rejected",
+        payload: "There was an error loading cities...",
+      });
     }
-    fetchCities();
   }, []);
 
   const getCity = useCallback(
@@ -69,13 +60,9 @@ function CitiesProvider({ children }) {
       dispatch({ type: "loading" });
 
       try {
-        const res = await fetch(BASE_URL);
-        if (!res.ok) throw new Error("Network response was not ok");
-        const data = await res.json();
-        const city = data.find((city) => city.id === Number(id));
+        const city = citiesData.find((city) => city.id === Number(id));
         dispatch({ type: "city/loaded", payload: city });
       } catch (error) {
-        console.error("Error fetching city:", error);
         dispatch({
           type: "rejected",
           payload: "There was an error loading the city...",
